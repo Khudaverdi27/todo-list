@@ -1,15 +1,13 @@
-const items = [
-    // html comes here from todo.js with key and value as object
+const todos = [
+    { name: 'Task 1', id: 1, status: 0 },
+    { name: 'Task 2', id: 2, status: 1 },
+    { name: 'Task 3', id: 3, status: 0 }
 ]
 
-const todo = new Todo(items)
+const todo = new Todo(todos)
+UI.addBtn.addEventListener('click', () => {
 
-UI.addBTn.addEventListener(('click'), () => {
-    const text = UI.textInput.value
-    if (text.toString().trim()) {
-        todo.add(text)
-        UI.textInput.value = ''
-    }
+    todo.add(UI.textInput.value);
 })
 
 todo.createUI()

@@ -1,6 +1,8 @@
 const UI = {
-    container: document.getElementById('taskContainer'),
-    addBTn: document.getElementById('addBtn'),
-    textInput: document.getElementById('textInput'),
-
+    container: document.querySelector('#taskContainer'),
+    textInput: document.querySelector('#textInput'),
+    addBtn: document.querySelector('#addBtn'),
+    btnAll: document.querySelector('#btnAll'),
+    btnCompleted: document.querySelector('#btnCompleted'),
+    btnPending: document.querySelector('#btnPending'),
 }
