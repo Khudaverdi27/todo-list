@@ -1,180 +1,78 @@
 class Todo {
-    constructor(options = {}) {
-        this.UI = {
-            container: document.querySelector('[data-todo-container]'),
-            addBtn: document.querySelector('[data-todo-btn-add]'),
-            btnStatus: document.querySelectorAll('.data-todo-btn-status'),
-            textInput: document.querySelector('[data-todo-input-text]'),
-            updateStatus: document.querySelectorAll('[data-todo-update-status]'),
-        }
-        this.todos = localStorage.getItem('todos') ? JSON.parse(localStorage.getItem('todos')) : [];
-        this.todoId = false;
-        this.status = '-1';
-        this.icon = {
-            edit: options?.icon?.edit || false,
-            trash: options?.icon?.trash || false,
-        }
+    constructor(todos) {
+        this.todos = todos;
+        this.todoId = false
     }
-    /* 
-        Save LocalStorage
-    */
-    saveLocalStorage() {
-        localStorage.setItem('todos', JSON.stringify(this.todos))
+    getIndexById(id) {
+        return this.todos.findIndex(i => i.id == id);
     }
-    /* 
-        Get Random Id
-    */
     getId() {
-        return Math.floor(Math.random() * 100000);
+        return Date.now();
     }
-    /* 
-        Get Todo Index By Id
-    */
-    getTodoIndexById(id) {
-        return this.todos.findIndex(i => i.id.toString() === id.toString());
-    }
-    /* 
-        Save Todo
-    */
-    save(name) {
-        if (this.todoId) {
-            const index = this.getTodoIndexById(this.todoId);
-            this.todos[index].name = name;
-
-            this.todoId = false;
-        }
-        else {
-            this.todos.unshift({
-                id: this.getId(),
-                name,
-                status: 0
-            });
-        }
-        this.UI.textInput.value = '';
-        this.createUI();
-        this.saveLocalStorage();
-    }
-    /* 
-        Todo Update
-    */
-    update(id) {
-        const index = this.getTodoIndexById(id);
-        if (index !== -1) {
-            const todo = this.todos[index];
-            if (todo) {
-                this.UI.textInput.value = todo.name;
-                this.todoId = todo.id;
-            }
-        }
-    }
-    /* 
-        Todo Delete
-    */
-    delete(id) {
-        const index = this.getTodoIndexById(id)
-        if (index !== -1) {
-            this.todos.splice(index, 1);
-            this.createUI();
-            this.saveLocalStorage();
-        }
-    }
-    /* 
-        Update Todo Staus
-    */
     updateStatus(id, status) {
-        const index = this.getTodoIndexById(id)
-        if (index !== -1) {
-            this.todos[index].status = status;
-            this.createUI();
-            this.saveLocalStorage();
-        }
+        const index = this.getIndexById(id)
+        this.todos[index].status = status
+        this.createUI()
     }
-    /* 
-        Create UI Element
-    */
-    createUI() {
-        let html = '';
+    add(name) {
 
-        let items = this.todos;
-
-        if (this.status !== '-1') {
-            items = this.todos.filter(i => i.status === this.status)
-        }
-
-        for (let todo of items) {
-            html += `
-            <article class="flex items-center justify-between border border-theme p-8">
-                <div>
-                    <input type="checkbox" ${todo.status ? 'checked' : ''} data-todo-update-status data-id="${todo.id}">
-                    <span class="${todo.status ? 'line-through' : ''}">${todo.name}</span>
-                </div>
-                <div>
-                    <button class="btn btn-rounded btn-primary btn-sm" data-todo-btn-edit data-id="${todo.id}">
-                        <i class="${this.icon.edit}"></i>
-                    </button>
-
-                    <button class="btn btn-rounded btn-danger btn-sm" data-todo-btn-delete data-id="${todo.id}">
-                        <i class="${this.icon.trash}"></i>
-                    </button>
-                </div>
-            </article>
-            `
-        }
-
-        this.UI.container.innerHTML = html;
-
-        document.querySelectorAll('[data-todo-update-status]').forEach(input => {
-            const id = input.getAttribute('data-id');
-            input.addEventListener('change', (e) => {
-                this.updateStatus(id, e.target.checked ? 1 : 0)
-            });
-        })
-
-        document.querySelectorAll('[data-todo-btn-delete]').forEach(input => {
-            const id = input.getAttribute('data-id');
-            input.addEventListener('click', () => {
-                this.delete(id)
-            });
-        })
-
-        document.querySelectorAll('[data-todo-btn-edit]').forEach(input => {
-            const id = input.getAttribute('data-id');
-            input.addEventListener('click', () => {
-                this.update(id)
-            });
-        })
-    }
-    /* 
-        Start Application
-    */
-    start() {
-        const obj = this;
-        obj.UI.addBtn.addEventListener('click', function () {
-            const text = obj.UI.textInput.value;
-
-            if (text.toString().trim()) {
-                todo.save(text);
-            }
-        })
-
-        this.UI.btnStatus.forEach(e => {
-            e.addEventListener('click', () => {
-                const status = e.getAttribute('data-status');
-
-                this.UI.btnStatus.forEach(b => {
-                    b.classList.remove('active-status')
-                })
-
-                e.classList.add('active-status');
-
-                if (status !== '-1') {
-                    todo.status = parseInt(status);
-                }
-                else todo.status = '-1';
-                todo.createUI();
+        const index = this.getIndexById(this.todoId)
+        console.log(index);
+        if (this.todoId >= -1) {
+            this.todos[index].name = name
+            this.todoId = false
+        } else {
+            this.todos.unshift({
+                name,
+                id: this.getId(),
+                status: 0
             })
-        })
+        }
 
-        this.createUI();
+        this.createUI()
     }
-}   
+    edit(id) {
+        const index = this.getIndexById(id)
+        UI.textInput.value = this.todos[index].name
+        this.todoId = id
+    }
+    delete(id) {
+        const index = this.getIndexById(id)
+        this.todos.splice(index, 1)
+        this.createUI()
+    }
+    createUI() {
+
+        const tasks = this.todos.map(todo => {
+            return `   <article class="flex items-center justify-between border border-theme p-8">
+            <div>
+                <input ${todo.status ? "checked" : ''} data-id="${todo.id}" class="btnStatus" type="checkbox">
+                <span class="${todo.status ? 'line-through' : ''}">${todo.name}</span>
+            </div>
+            <div>
+                <button class="btn btnEdit btn-rounded btn-primary btn-sm"  data-id="${todo.id}">
+                    <i class="icon-pen icon"></i>
+                </button>
+
+                <button class="btn btnDelete btn-rounded btn-danger btn-sm"  data-id="${todo.id}">
+                    <i class="icon-trash icon"></i>
+                </button>
+            </div>
+        </article>`
+        }).join('');
+        UI.container.innerHTML = tasks
+        document.querySelectorAll('.btnStatus').forEach((input) => {
+            const id = input.getAttribute('data-id');
+            input.addEventListener('change', (e) => { this.updateStatus(id, e.target.checked ? 1 : 0) })
+        })
+        document.querySelectorAll('.btnDelete').forEach((btnDelete) => {
+            const id = btnDelete.getAttribute('data-id');
+            btnDelete.addEventListener('click', () => { this.delete(id) });
+        })
+        document.querySelectorAll('.btnEdit').forEach((btnEdit) => {
+            const id = btnEdit.getAttribute('data-id');
+            btnEdit.addEventListener('click', () => { this.edit(id) });
+        })
+    }
+
+}
