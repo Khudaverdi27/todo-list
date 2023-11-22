@@ -1,6 +1,6 @@
 class Todo {
-    constructor(todos) {
-        this.todos = todos;
+    constructor() {
+        this.todos = [];
         this.todoId = false;
         this.status = -1
     }
@@ -16,9 +16,7 @@ class Todo {
         this.createUI()
     }
     add(name) {
-
         const index = this.getIndexById(this.todoId)
-
         if (index > -1) {
             this.todos[index].name = name
             this.todoId = false
@@ -31,6 +29,7 @@ class Todo {
         }
 
         this.createUI()
+
     }
     edit(id) {
         const index = this.getIndexById(id)
