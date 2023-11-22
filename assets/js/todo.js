@@ -1,7 +1,8 @@
 class Todo {
     constructor(todos) {
         this.todos = todos;
-        this.todoId = false
+        this.todoId = false;
+        this.status = -1
     }
     getIndexById(id) {
         return this.todos.findIndex(i => i.id == id);
@@ -17,8 +18,8 @@ class Todo {
     add(name) {
 
         const index = this.getIndexById(this.todoId)
-        console.log(index);
-        if (this.todoId >= -1) {
+
+        if (index > -1) {
             this.todos[index].name = name
             this.todoId = false
         } else {
@@ -35,6 +36,7 @@ class Todo {
         const index = this.getIndexById(id)
         UI.textInput.value = this.todos[index].name
         this.todoId = id
+        console.log(this.todoId);
     }
     delete(id) {
         const index = this.getIndexById(id)
@@ -42,8 +44,13 @@ class Todo {
         this.createUI()
     }
     createUI() {
+        let items = this.todos;
 
-        const tasks = this.todos.map(todo => {
+        if (this.status != -1) {
+            items = items.filter(i => i.status == this.status)
+        }
+
+        const tasks = items.map(todo => {
             return `   <article class="flex items-center justify-between border border-theme p-8">
             <div>
                 <input ${todo.status ? "checked" : ''} data-id="${todo.id}" class="btnStatus" type="checkbox">
